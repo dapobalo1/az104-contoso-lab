@@ -1,0 +1,19 @@
+# Secrets: never commit
+.env
+.env.*
+*.pem
+*.key
+*.pfx
+credentials.json
+token*.json
+*.parameters.local.json
+*secret*
+.azure/
+
+# Unredacted screenshots stay local until redacted
+screenshots/raw/
+
+# OS / editor
+.DS_Store
+.vscode/
+*.swp
