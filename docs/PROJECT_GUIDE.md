@@ -329,6 +329,8 @@ Create these five users:
 
 **Time:** 3 hours. **Cost:** a few dollars if VMs are deallocated after the session.
 
+> **As built (2026-10-30):** two subscriptions, to keep cost near $0. The Azure for Students subscription (school tenant, capped by its credit) runs the compute work: Bicep, VM administration, disks, availability sets, scale sets, Policy, locks, and Advisor. A pay-as-you-go subscription in the lab tenant runs the steps that need the lab tenant: `mg-contoso`, the budget, and the RBAC sign-in tests, using one small VM that is deleted the same session.
+
 ### Steps
 
 #### 2.1 Budget first
