@@ -44,8 +44,10 @@ You are the new Azure administrator for **Contoso**, a small company with an IT 
 
 ### A2. Regions
 
-- Primary: **East US 2**
-- Secondary (Site Recovery in Project 5): **Central US**
+> **As built (2026-11-19):** regions changed from East US 2 / Central US. The Azure for Students subscription carries a Microsoft-assigned policy, `sys.regionrestriction` (Allowed resource deployment regions, Indexed mode), that only allows North Central US, Canada Central, Sweden Central, Norway East, and Germany West Central. Canada Central is primary because it has availability zones; North Central US (no zones) is the Site Recovery target.
+
+- Primary: **Canada Central**
+- Secondary (Site Recovery in Project 5): **North Central US**
 - Stick to these two. Policy in Project 2 will enforce it.
 
 ### A3. Naming convention
@@ -343,10 +345,10 @@ Create these five users:
 - [ ] Note the hierarchy: Root management group > mg-contoso > subscription > resource groups > resources.
 
 #### 2.3 Resource groups with tags
-- [ ] Create `rg-contoso-compute`, `rg-contoso-compute-moved`, and `rg-contoso-storage` in East US 2 with the four tags from A4.
+- [ ] Create `rg-contoso-compute`, `rg-contoso-compute-moved`, and `rg-contoso-storage` in Canada Central with the four tags from A4.
 
 #### 2.4 Azure Policy
-- [ ] Assign built-in **Allowed locations** at `mg-contoso`: East US 2 and Central US.
+- [ ] Assign built-in **Allowed locations** at `mg-contoso`: Canada Central and North Central US.
 - [ ] Assign built-in **Require a tag on resource groups** with tag name `owner`.
 - [ ] Assign built-in **Inherit a tag from the resource group if missing** with tag `costcenter`. This uses the **Modify** effect, so the assignment creates a managed identity. Create a **remediation task** for existing resources.
 - [ ] Test: create a resource group in West Europe. It should be denied. Screenshot.
@@ -463,8 +465,8 @@ output vmNames array = [] // TODO
 ### Steps
 
 #### 3.1 Create storage accounts
-- [ ] Create `stcontosodata<xxxx>` in `rg-contoso-storage`: Standard, StorageV2, **LRS**, East US 2. On the Advanced tab note **Allow storage account key access** and minimum TLS 1.2. On the Encryption tab note **infrastructure encryption** can only be enabled at creation.
-- [ ] Create a second account `stcontosorepl<xxxx>` in Central US, LRS (target for object replication).
+- [ ] Create `stcontosodata<xxxx>` in `rg-contoso-storage`: Standard, StorageV2, **LRS**, Canada Central. On the Advanced tab note **Allow storage account key access** and minimum TLS 1.2. On the Encryption tab note **infrastructure encryption** can only be enabled at creation.
+- [ ] Create a second account `stcontosorepl<xxxx>` in North Central US, LRS (target for object replication).
 - [ ] Change redundancy on the first account from LRS to **GRS** in Redundancy settings. Then try selecting ZRS and read why it requires a conversion.
 
 #### 3.2 Containers and data movement
@@ -509,7 +511,7 @@ output vmNames array = [] // TODO
 
 #### 3.5 Object replication
 - [ ] Enable versioning on both accounts and **change feed** on the source.
-- [ ] Create a replication policy: source `documents` > destination container on the Central US account.
+- [ ] Create a replication policy: source `documents` > destination container on the North Central US account.
 - [ ] Upload a new file and confirm it appears in the destination.
 
 #### 3.6 Access: keys, SAS, stored access policies
@@ -743,7 +745,7 @@ StorageBlobLogs
 - [ ] Monitor > Insights > **Storage accounts**: review availability and latency.
 
 #### 5.7 Backup with Recovery Services vault
-- [ ] Create `rsv-contoso` in East US 2 (in `rg-contoso-monitor`). Note the vault redundancy setting (GRS default) can only be changed **before** protecting items.
+- [ ] Create `rsv-contoso` in Canada Central (in `rg-contoso-monitor`). Note the vault redundancy setting (GRS default) can only be changed **before** protecting items.
 - [ ] Create backup policy `pol-vm-daily`: daily at 11 PM, retain daily for 7 days, weekly for 4 weeks.
 - [ ] Enable backup on web01 with that policy. Run **Backup now**.
 - [ ] After it completes: **File Recovery** (mount the recovery point via script and copy a file out), then **Restore VM** as a new VM `vm-contoso-web01-restored`. Delete the restored VM afterward.
@@ -755,9 +757,9 @@ StorageBlobLogs
 - [ ] Write in exam notes which workloads go to which vault: Recovery Services vault (VMs, Azure Files, SQL/SAP in VMs) vs Backup vault (blobs, managed disks, PostgreSQL, AKS).
 
 #### 5.9 Site Recovery
-- [ ] Create a Recovery Services vault `rsv-contoso-dr` in **Central US** (target region).
-- [ ] On web02: Disaster recovery > target region Central US > let it create target resources. Wait for replication health to be healthy (can take an hour).
-- [ ] Run **Test failover** to an isolated test VNet. Confirm the VM boots in Central US. Then **Cleanup test failover**.
+- [ ] Create a Recovery Services vault `rsv-contoso-dr` in **North Central US** (target region).
+- [ ] On web02: Disaster recovery > target region North Central US > let it create target resources. Wait for replication health to be healthy (can take an hour).
+- [ ] Run **Test failover** to an isolated test VNet. Confirm the VM boots in North Central US. Then **Cleanup test failover**.
 - [ ] Read through planned failover, commit, and re-protect steps. Optional: run a real failover and failback if credit allows.
 - [ ] Disable replication when done (stops billing).
 
@@ -781,7 +783,7 @@ StorageBlobLogs
 - Site Recovery: replicate > test failover > failover > commit > re-protect > failback.
 
 ### Document it
-- [ ] Screenshots: dashboard, saved KQL results, alert email, processing rule, Connection Monitor, file recovery, test failover VM in Central US, backup report.
+- [ ] Screenshots: dashboard, saved KQL results, alert email, processing rule, Connection Monitor, file recovery, test failover VM in North Central US, backup report.
 - [ ] Commit the KQL queries as `.kql` files.
 - [ ] README, break/fix log, exam notes, LinkedIn draft.
 

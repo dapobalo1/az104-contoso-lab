@@ -12,7 +12,7 @@ Adedapo holds AWS Solutions Architect Associate and Security+. When explaining A
 
 ## Conventions
 - Naming: `<type>-contoso-<purpose>`; storage accounts `stcontoso<purpose><4 chars>`.
-- Regions: East US 2 (primary), Central US (secondary). Nothing else.
+- Regions: Canada Central (primary), North Central US (secondary). Nothing else.
 - Tags on every resource group: env, owner, project, costcenter.
 - Infrastructure as code: Bicep preferred, Azure CLI for one-off commands.
 - Screenshots: `projects/<NN-name>/screenshots/PP-SS-description.png`.
