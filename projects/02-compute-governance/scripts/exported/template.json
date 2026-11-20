@@ -1,0 +1,314 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "networkInterfaces_nic_contoso_web01_name": {
+      "type": "String"
+    },
+    "networkInterfaces_nic_contoso_web02_name": {
+      "type": "String"
+    },
+    "virtualMachines_vm_contoso_web01_name": {
+      "type": "String"
+    },
+    "virtualMachines_vm_contoso_web02_name": {
+      "type": "String"
+    },
+    "virtualNetworks_vnet_contoso_app_name": {
+      "type": "String"
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2025-09-01",
+      "location": "canadacentral",
+      "name": "[parameters('virtualNetworks_vnet_contoso_app_name')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "10.1.0.0/16"
+          ]
+        },
+        "enableDdosProtection": false,
+        "privateEndpointVNetPolicies": "Disabled",
+        "subnets": [
+          {
+            "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_vnet_contoso_app_name'), 'snet-web')]",
+            "name": "snet-web",
+            "properties": {
+              "addressPrefix": "10.1.1.0/24",
+              "delegations": [],
+              "privateEndpointNetworkPolicies": "Disabled",
+              "privateLinkServiceNetworkPolicies": "Enabled"
+            }
+          }
+        ],
+        "virtualNetworkPeerings": []
+      },
+      "tags": {
+        "costcenter": "it",
+        "env": "lab",
+        "owner": "dapo",
+        "project": "az104-p2"
+      },
+      "type": "Microsoft.Network/virtualNetworks"
+    },
+    {
+      "apiVersion": "2026-04-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_nic_contoso_web01_name'))]"
+      ],
+      "location": "canadacentral",
+      "name": "[parameters('virtualMachines_vm_contoso_web01_name')]",
+      "properties": {
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true
+          }
+        },
+        "hardwareProfile": {
+          "vmSize": "Standard_B2pts_v2"
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_nic_contoso_web01_name'))]",
+              "properties": {
+                "deleteOption": "Delete"
+              }
+            }
+          ]
+        },
+        "osProfile": {
+          "adminUsername": "contosoadmin",
+          "allowExtensionOperations": true,
+          "computerName": "web01",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": false,
+            "enableVMAgentPlatformUpdates": true,
+            "patchSettings": {
+              "assessmentMode": "ImageDefault",
+              "patchMode": "ImageDefault"
+            },
+            "provisionVMAgent": true
+          },
+          "requireGuestProvisionSignal": true,
+          "secrets": []
+        },
+        "securityProfile": {
+          "securityType": "Standard"
+        },
+        "storageProfile": {
+          "dataDisks": [],
+          "diskControllerType": "SCSI",
+          "imageReference": {
+            "offer": "ubuntu-24_04-lts",
+            "publisher": "Canonical",
+            "sku": "server-arm64",
+            "version": "latest"
+          },
+          "osDisk": {
+            "caching": "ReadWrite",
+            "createOption": "FromImage",
+            "deleteOption": "Delete",
+            "diskSizeGB": 30,
+            "managedDisk": {
+              "id": "[resourceId('Microsoft.Compute/disks', 'osdisk-contoso-web01')]",
+              "storageAccountType": "StandardSSD_LRS"
+            },
+            "name": "osdisk-contoso-web01",
+            "osType": "Linux"
+          }
+        }
+      },
+      "tags": {
+        "costcenter": "it",
+        "env": "lab",
+        "owner": "dapo",
+        "project": "az104-p2"
+      },
+      "type": "Microsoft.Compute/virtualMachines",
+      "zones": [
+        "1"
+      ]
+    },
+    {
+      "apiVersion": "2026-04-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_nic_contoso_web02_name'))]"
+      ],
+      "location": "canadacentral",
+      "name": "[parameters('virtualMachines_vm_contoso_web02_name')]",
+      "properties": {
+        "diagnosticsProfile": {
+          "bootDiagnostics": {
+            "enabled": true
+          }
+        },
+        "hardwareProfile": {
+          "vmSize": "Standard_B2pts_v2"
+        },
+        "networkProfile": {
+          "networkInterfaces": [
+            {
+              "id": "[resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_nic_contoso_web02_name'))]",
+              "properties": {
+                "deleteOption": "Delete"
+              }
+            }
+          ]
+        },
+        "osProfile": {
+          "adminUsername": "contosoadmin",
+          "allowExtensionOperations": true,
+          "computerName": "web02",
+          "linuxConfiguration": {
+            "disablePasswordAuthentication": false,
+            "enableVMAgentPlatformUpdates": true,
+            "patchSettings": {
+              "assessmentMode": "ImageDefault",
+              "patchMode": "ImageDefault"
+            },
+            "provisionVMAgent": true
+          },
+          "requireGuestProvisionSignal": true,
+          "secrets": []
+        },
+        "securityProfile": {
+          "securityType": "Standard"
+        },
+        "storageProfile": {
+          "dataDisks": [],
+          "diskControllerType": "SCSI",
+          "imageReference": {
+            "offer": "ubuntu-24_04-lts",
+            "publisher": "Canonical",
+            "sku": "server-arm64",
+            "version": "latest"
+          },
+          "osDisk": {
+            "caching": "ReadWrite",
+            "createOption": "FromImage",
+            "deleteOption": "Delete",
+            "diskSizeGB": 30,
+            "managedDisk": {
+              "id": "[resourceId('Microsoft.Compute/disks', 'osdisk-contoso-web02')]",
+              "storageAccountType": "StandardSSD_LRS"
+            },
+            "name": "osdisk-contoso-web02",
+            "osType": "Linux"
+          }
+        }
+      },
+      "tags": {
+        "costcenter": "it",
+        "env": "lab",
+        "owner": "dapo",
+        "project": "az104-p2"
+      },
+      "type": "Microsoft.Compute/virtualMachines",
+      "zones": [
+        "2"
+      ]
+    },
+    {
+      "apiVersion": "2025-09-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_vnet_contoso_app_name'), 'snet-web')]"
+      ],
+      "kind": "Regular",
+      "location": "canadacentral",
+      "name": "[parameters('networkInterfaces_nic_contoso_web01_name')]",
+      "properties": {
+        "auxiliaryMode": "None",
+        "auxiliarySku": "None",
+        "disableTcpStateTracking": false,
+        "dnsSettings": {
+          "dnsServers": []
+        },
+        "enableAcceleratedNetworking": false,
+        "enableIPForwarding": false,
+        "ipConfigurations": [
+          {
+            "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_nic_contoso_web01_name')), '/ipConfigurations/ipconfig1')]",
+            "name": "ipconfig1",
+            "properties": {
+              "primary": true,
+              "privateIPAddress": "10.1.1.5",
+              "privateIPAddressVersion": "IPv4",
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_vnet_contoso_app_name'), 'snet-web')]"
+              }
+            }
+          }
+        ],
+        "nicType": "Standard"
+      },
+      "tags": {
+        "costcenter": "it",
+        "env": "lab",
+        "owner": "dapo",
+        "project": "az104-p2"
+      },
+      "type": "Microsoft.Network/networkInterfaces"
+    },
+    {
+      "apiVersion": "2025-09-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_vnet_contoso_app_name'), 'snet-web')]"
+      ],
+      "kind": "Regular",
+      "location": "canadacentral",
+      "name": "[parameters('networkInterfaces_nic_contoso_web02_name')]",
+      "properties": {
+        "auxiliaryMode": "None",
+        "auxiliarySku": "None",
+        "disableTcpStateTracking": false,
+        "dnsSettings": {
+          "dnsServers": []
+        },
+        "enableAcceleratedNetworking": false,
+        "enableIPForwarding": false,
+        "ipConfigurations": [
+          {
+            "id": "[concat(resourceId('Microsoft.Network/networkInterfaces', parameters('networkInterfaces_nic_contoso_web02_name')), '/ipConfigurations/ipconfig1')]",
+            "name": "ipconfig1",
+            "properties": {
+              "primary": true,
+              "privateIPAddress": "10.1.1.4",
+              "privateIPAddressVersion": "IPv4",
+              "privateIPAllocationMethod": "Dynamic",
+              "subnet": {
+                "id": "[resourceId('Microsoft.Network/virtualNetworks/subnets', parameters('virtualNetworks_vnet_contoso_app_name'), 'snet-web')]"
+              }
+            }
+          }
+        ],
+        "nicType": "Standard"
+      },
+      "tags": {
+        "costcenter": "it",
+        "env": "lab",
+        "owner": "dapo",
+        "project": "az104-p2"
+      },
+      "type": "Microsoft.Network/networkInterfaces"
+    },
+    {
+      "apiVersion": "2025-09-01",
+      "dependsOn": [
+        "[resourceId('Microsoft.Network/virtualNetworks', parameters('virtualNetworks_vnet_contoso_app_name'))]"
+      ],
+      "name": "[concat(parameters('virtualNetworks_vnet_contoso_app_name'), '/snet-web')]",
+      "properties": {
+        "addressPrefix": "10.1.1.0/24",
+        "delegations": [],
+        "privateEndpointNetworkPolicies": "Disabled",
+        "privateLinkServiceNetworkPolicies": "Enabled"
+      },
+      "type": "Microsoft.Network/virtualNetworks/subnets"
+    }
+  ],
+  "variables": {}
+}

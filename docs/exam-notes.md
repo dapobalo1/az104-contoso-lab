@@ -43,3 +43,18 @@ Three to five lines per project. Format: `- [P#] takeaway`. Feed this file into 
 - [P1] One sign-in writes several log rows. Codes: 50126 bad password (CA Not Applied, it runs after primary auth), 50072 must register MFA, 50074 strong auth required, 50140 "Stay signed in?" interrupt, 53003 blocked by Conditional Access, 0 success.
 - [P1] Sign-in log Conditional Access tab shows what actually happened; the Report-only tab shows what Report-only policies would have done. What If only predicts.
 - [P1] Dynamic group troubleshooting: Dynamic membership rules > Validate Rules tests chosen users against the rule instantly and shows the actual attribute value. Overview shows processing status and last membership change. `-eq` is case-insensitive. You cannot add members manually to a dynamic group.
+- [P2] Budgets only alert, they never stop resources. Cost Management opens at billing-account scope by default; a subscription budget only shows when the scope is set to that subscription.
+- [P2] Policies stack: a resource must satisfy every assignment that applies. A deny from any one wins, and Owner cannot override Policy.
+- [P2] "Allowed locations" (Indexed mode) ignores resource groups; use "Allowed locations for resource groups" to restrict RG regions. Resources can live in a different region than their RG.
+- [P2] Azure for Students ships with a Microsoft-assigned "Allowed resource deployment regions" policy (sys.regionrestriction). Check existing assignments before planning regions.
+- [P2] The portal pre-checks policy: the region picker groups regions as Recommended / Other / Ineligible, and errors show beside the field. CLI/API calls get RequestDisallowedByPolicy, which names the blocking assignment.
+- [P2] Modify and DeployIfNotExists effects need a managed identity, plus a remediation task to fix resources that already exist.
+- [P2] `az vm list-skus -l <region>` shows which sizes and zones a subscription can actually use. Offers like Azure for Students hide many sizes per region.
+- [P2] Bicep: referencing another resource's property (e.g. `vnet.properties.subnets[0].id`) creates an implicit dependency, no `dependsOn` needed. `@secure()` keeps a parameter out of deployment history.
+- [P2] Export template captures current state, not your source: names become parameters, values are hardcoded (location, private IPs), defaults appear explicitly, and secrets (adminPassword) are dropped, so an export cannot recreate a VM as-is.
+- [P2] `az bicep decompile` is best-effort: a subnet defined both inline in the VNet and as a child resource produced a cycle (BCP080) that must be fixed by hand.
+- [P2] Disk SKU and size changes need the VM deallocated (or the disk unattached); the portal greys out Save otherwise. Disk state: Attached (VM running), Reserved (VM deallocated), Unattached.
+- [P2] A zonal disk can only be LRS: ZRS disk types are disabled when an availability zone is selected. ZRS disks are the alternative to zone-pinning for surviving a zone outage.
+- [P2] Resize: a running VM can only go to sizes on its current hardware cluster; deallocate to see every size in the region. A resize cannot change CPU architecture (ARM64 <-> x86). Resizing a deallocated VM leaves it deallocated.
+- [P2] Move between resource groups: no downtime, both RGs are locked during the move, resource IDs change, validation runs first. The region cannot change (Azure Resource Mover handles cross-region). A NIC can reference a subnet in another RG.
+- [P2] Encryption at host: register the EncryptionAtHost feature on the subscription, deallocate, set securityProfile.encryptionAtHost=true. It encrypts temp disks and caches on the host; server-side encryption (EncryptionAtRestWithPlatformKey) still covers the managed disks themselves.
